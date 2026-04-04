@@ -5,7 +5,8 @@
     "type": "library",
     "require": {
         "php": ">=8.5",
-        "dave-liddament/php-language-extensions": "^0.10.0"
+        "dave-liddament/php-language-extensions": "^0.10.0",
+        "webmozart/assert": "^2.1"
     },
     "autoload": {
         "psr-4": {
