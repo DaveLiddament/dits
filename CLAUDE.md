@@ -24,3 +24,7 @@ Common commands:
 - `make app/composer c="require some/package"` — Run composer commands
 
 Only fall back to `docker compose exec app <command>` if there is no suitable Make target.
+
+## Workflow
+
+- Always run `make app/ci` after completing any task and fix all failures before considering the task done.
