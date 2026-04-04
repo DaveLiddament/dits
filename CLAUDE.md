@@ -1,3 +1,8 @@
+## Project Overview
+
+See [README.md](README.md) for the project purpose and high-level design.
+See [docs/detailed-notes.md](docs/detailed-notes.md) for technical details, edge cases, and design decisions.
+
 ## Docker
 
 This project uses Docker for all PHP operations.
