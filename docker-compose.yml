@@ -1,0 +1,16 @@
+services:
+  app:
+    build:
+      context: .
+      args:
+        PHP_VERSION: "8.5"
+    tty: true
+    stdin_open: true
+    environment:
+      XDEBUG_MODE: debug
+    volumes:
+      - .:/app
+      - composer-cache:/root/.composer/cache
+
+volumes:
+  composer-cache:
