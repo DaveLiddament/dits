@@ -3,6 +3,8 @@ parameters:
     paths:
         - src
         - tests
+    excludePaths:
+        - fixtures
     phpLanguageExtensions:
         mode: none
     checkUninitializedProperties: true

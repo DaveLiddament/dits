@@ -11,6 +11,7 @@
     ],
     "require": {
         "php": ">=8.5 <8.6",
+        "ext-simplexml": "*",
         "dave-liddament/php-language-extensions": "^0.10.0",
         "webmozart/assert": "^2.1"
     },
