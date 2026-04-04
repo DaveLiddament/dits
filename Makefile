@@ -51,7 +51,7 @@ logs: ## Show live logs
 	@$(DOCKER_COMP) logs --tail=0 --follow
 
 ## —— App ——————————————————————————————————————————————————————————————————————
-.PHONY: app/shell app/composer app/setup app/ci app/test app/phpstan app/cs-fix app/cs app/lint app/composer-unused app/require-checker app/composer-validate
+.PHONY: app/shell app/composer app/setup app/ci app/test app/tsm app/phpstan app/cs-fix app/cs app/lint app/composer-unused app/require-checker app/composer-validate
 
 app/shell: ## Open a shell in the app container
 	@$(APP_EXEC) bash
@@ -69,6 +69,9 @@ app/ci: ## Run local CI tasks
 app/test: ## Run tests. Pass the parameter "c=" to add options to phpunit
 	@$(eval c ?=)
 	@$(APP_EXEC) vendor/bin/phpunit $(c)
+
+app/tsm: ## Run test-mapper
+	@$(APP_EXEC) composer tsm
 
 app/phpstan: ## Run PHPStan analysis
 	@$(APP_EXEC) composer phpstan

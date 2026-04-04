@@ -3,8 +3,14 @@
     "description": "Test selector for PHP projects",
     "license": "MIT",
     "type": "library",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/DaveLiddament/test-mapper"
+        }
+    ],
     "require": {
-        "php": ">=8.5",
+        "php": ">=8.5 <8.6",
         "dave-liddament/php-language-extensions": "^0.10.0",
         "webmozart/assert": "^2.1"
     },
@@ -27,7 +33,8 @@
         "dave-liddament/phpstan-php-language-extensions": "*",
         "spaze/phpstan-disallowed-calls": "*",
         "rector/rector": "*",
-        "phpunit/phpunit": "*"
+        "phpunit/phpunit": "*",
+        "dave-liddament/test-mapper": "dev-main"
     },
     "extra": {
         "bamarni-bin": {
@@ -47,7 +54,8 @@
             "@composer-require-checker",
             "@cs",
             "@phpstan",
-            "@test"
+            "@test",
+            "@tsm"
         ],
         "ci-local": [
             "@composer-validate",
@@ -56,7 +64,8 @@
             "@composer-require-checker",
             "@cs-fix",
             "@phpstan",
-            "@test"
+            "@test",
+            "@tsm"
         ],
         "composer-validate": "@composer validate --no-check-all --strict",
         "lint": "parallel-lint src tests utils",
@@ -65,7 +74,8 @@
         "cs": "php-cs-fixer fix -v --dry-run",
         "cs-fix": "php-cs-fixer fix -v",
         "phpstan": "phpstan analyse --no-progress",
-        "test": "phpunit"
+        "test": "phpunit",
+        "tsm": "test-mapper --specs-dir=specs -u"
     },
     "config": {
         "allow-plugins": {
