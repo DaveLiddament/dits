@@ -92,6 +92,21 @@ final class ChangesTest extends TestCase
     }
 
     #[Test]
+    public function fuzzMatchesAdjacentLines(): void
+    {
+        $changes = new Changes(new Differences(
+            [],
+            [new LineDiff('src/Foo.php', 10)],
+        ));
+
+        self::assertFalse($changes->hasChanged('src/Foo.php', 8));
+        self::assertTrue($changes->hasChanged('src/Foo.php', 9));
+        self::assertTrue($changes->hasChanged('src/Foo.php', 10));
+        self::assertTrue($changes->hasChanged('src/Foo.php', 11));
+        self::assertFalse($changes->hasChanged('src/Foo.php', 12));
+    }
+
+    #[Test]
     public function matchesCorrectFileAmongMultiple(): void
     {
         $changes = new Changes(new Differences(

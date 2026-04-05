@@ -28,8 +28,8 @@ For modified files, parse the unified diff output to find which lines in the **o
 
 - Hunk headers (`@@ -old,count +new,count @@`) give the starting line number in the old file
 - Lines starting with `-` are removed/changed lines → produce a `LineDiff`
-- Lines starting with `+` are additions (no old line number)
-- Lines starting with ` ` are context (unchanged)
+- Lines starting with `+` are additions → produce a `LineDiff` at the current old line position (deduplicated for consecutive insertions). This captures where in the original file the insertion occurred.
+- Uses `--unified=0` so no context lines appear
 
 ## Git commands
 

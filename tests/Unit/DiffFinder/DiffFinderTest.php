@@ -74,10 +74,10 @@ final class DiffFinderTest extends TestCase
         $differences = $this->diffFinder->find('main', true);
 
         self::assertCount(0, $differences->fileDiffs);
-        self::assertCount(1, $differences->lineDiffs);
-        self::assertSame('src/Foo.php', $differences->lineDiffs[0]->fileName);
-        // Line 11 in the original: `return 1;` changed to `return 2;`
+        // Line 11 removed (the old `return 1;`) + insertion recorded at line 12 (the new `return 2;`)
+        self::assertCount(2, $differences->lineDiffs);
         self::assertSame(11, $differences->lineDiffs[0]->lineNumber);
+        self::assertSame(12, $differences->lineDiffs[1]->lineNumber);
     }
 
     #[Test]
@@ -95,7 +95,6 @@ final class DiffFinderTest extends TestCase
         $differences = $this->diffFinder->find('main', true);
 
         self::assertCount(0, $differences->fileDiffs);
-        self::assertCount(2, $differences->lineDiffs);
 
         $lineNumbers = array_map(
             static fn ($ld): int => $ld->lineNumber,
@@ -103,8 +102,8 @@ final class DiffFinderTest extends TestCase
         );
         sort($lineNumbers);
 
-        // Line 11: `return 1;` → `return 10;`  and  Line 21: `return 3;` → `return 30;`
-        self::assertSame([11, 21], $lineNumbers);
+        // Line 11: removal + insertion, Line 21: removal + insertion
+        self::assertSame([11, 12, 21, 22], $lineNumbers);
     }
 
     #[Test]
@@ -130,8 +129,9 @@ final class DiffFinderTest extends TestCase
         sort($fileNames);
         self::assertSame(['src/NewClass.php', 'src/OldClass.php'], $fileNames);
 
-        self::assertCount(1, $differences->lineDiffs);
+        self::assertCount(2, $differences->lineDiffs);
         self::assertSame('src/Foo.php', $differences->lineDiffs[0]->fileName);
+        self::assertSame('src/Foo.php', $differences->lineDiffs[1]->fileName);
     }
 
     #[Test]

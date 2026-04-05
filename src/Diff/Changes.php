@@ -20,7 +20,7 @@ readonly class Changes
         }
 
         foreach ($this->differences->lineDiffs as $lineDiff) {
-            if ($lineDiff->fileName === $fileName && $lineDiff->lineNumber === $lineNumber) {
+            if ($lineDiff->fileName === $fileName && abs($lineDiff->lineNumber - $lineNumber) <= 1) {
                 return true;
             }
         }

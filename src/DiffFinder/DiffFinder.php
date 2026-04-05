@@ -85,10 +85,12 @@ final readonly class DiffFinder
     {
         $lineDiffs = [];
         $oldLineNumber = null;
+        $insertionRecorded = false;
 
         foreach ($diffLines as $line) {
             if (str_starts_with($line, '@@')) {
                 $oldLineNumber = $this->parseHunkHeaderOldStart($line);
+                $insertionRecorded = false;
 
                 continue;
             }
@@ -100,11 +102,20 @@ final readonly class DiffFinder
             if (str_starts_with($line, '-') && !str_starts_with($line, '---')) {
                 $lineDiffs[] = new LineDiff($fileName, $oldLineNumber);
                 ++$oldLineNumber;
+                $insertionRecorded = false;
 
                 continue;
             }
 
             if (str_starts_with($line, '+') && !str_starts_with($line, '+++')) {
+                if (!$insertionRecorded) {
+                    // Record insertion at the current old line position.
+                    // For pure insertion hunks (@@ -N,0 +M,count @@), oldLineNumber is N
+                    // (the line after which insertion occurs). Use max(1, ...) for insertions before line 1.
+                    $lineDiffs[] = new LineDiff($fileName, max(1, $oldLineNumber));
+                    $insertionRecorded = true;
+                }
+
                 continue;
             }
         }
