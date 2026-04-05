@@ -3,6 +3,7 @@
     "description": "Test selector for PHP projects",
     "license": "MIT",
     "type": "library",
+    "bin": ["bin/generate-tcr"],
     "repositories": [
         {
             "type": "vcs",
@@ -13,7 +14,8 @@
         "php": ">=8.5 <8.6",
         "ext-simplexml": "*",
         "dave-liddament/php-language-extensions": "^0.10.0",
-        "webmozart/assert": "^2.1"
+        "webmozart/assert": "^2.1",
+        "symfony/console": "^7.4"
     },
     "autoload": {
         "psr-4": {
@@ -76,7 +78,7 @@
         "composer-require-checker": "composer-require-checker check",
         "cs": "php-cs-fixer fix -v --dry-run",
         "cs-fix": "php-cs-fixer fix -v",
-        "phpstan": "phpstan analyse --no-progress",
+        "phpstan": "phpstan analyse --no-progress --memory-limit=-1",
         "test": "phpunit",
         "coverage": [
             "XDEBUG_MODE=coverage phpunit --testsuite unit --coverage-clover build/coverage/clover.xml",
