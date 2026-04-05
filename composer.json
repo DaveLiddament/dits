@@ -3,7 +3,7 @@
     "description": "Test selector for PHP projects",
     "license": "MIT",
     "type": "library",
-    "bin": ["bin/generate-tcr", "bin/merge-tcr"],
+    "bin": ["bin/generate-tcr", "bin/merge-tcr", "bin/dits"],
     "repositories": [
         {
             "type": "vcs",
