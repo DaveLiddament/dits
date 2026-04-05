@@ -1,0 +1,19 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+foreach ([__DIR__.'/../vendor/autoload.php', __DIR__.'/../../../autoload.php'] as $autoload) {
+    if (file_exists($autoload)) {
+        require_once $autoload;
+        break;
+    }
+}
+
+use DaveLiddament\TestSelector\Command\MergeTcrCommand;
+use Symfony\Component\Console\Application;
+
+$application = new Application('merge-tcr', '0.1.0');
+$application->add(new MergeTcrCommand());
+$application->setDefaultCommand('merge-tcr', true);
+$application->run();

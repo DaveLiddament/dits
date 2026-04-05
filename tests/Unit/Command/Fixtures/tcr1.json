@@ -1,0 +1,11 @@
+{
+    "commitIdentifier": "abc123",
+    "testCoverages": [
+        {
+            "testName": "App\\Tests\\FooTest::testBar",
+            "lineCoverages": [
+                {"fileName": "src/Foo.php", "lineNumber": 10}
+            ]
+        }
+    ]
+}

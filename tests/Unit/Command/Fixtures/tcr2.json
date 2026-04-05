@@ -1,0 +1,11 @@
+{
+    "commitIdentifier": "abc123",
+    "testCoverages": [
+        {
+            "testName": "App\\Tests\\BazTest::testQux",
+            "lineCoverages": [
+                {"fileName": "src/Baz.php", "lineNumber": 5}
+            ]
+        }
+    ]
+}

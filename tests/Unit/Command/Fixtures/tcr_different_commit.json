@@ -1,0 +1,11 @@
+{
+    "commitIdentifier": "def456",
+    "testCoverages": [
+        {
+            "testName": "App\\Tests\\OtherTest::test",
+            "lineCoverages": [
+                {"fileName": "src/Other.php", "lineNumber": 1}
+            ]
+        }
+    ]
+}
