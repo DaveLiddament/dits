@@ -2,5 +2,6 @@
 /vendor-bin/*/vendor/
 /.php-cs-fixer.cache
 /.phpunit.cache/
+/build/
 /.idea/
 tests/External/Fixtures/.phpunit.result.cache

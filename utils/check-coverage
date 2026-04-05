@@ -1,0 +1,49 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+if ($argc < 3) {
+    fwrite(STDERR, "Usage: php utils/check-coverage <clover-file> <min-percentage>\n");
+    exit(1);
+}
+
+$file = $argv[1];
+$minPercentage = (float) $argv[2];
+
+if (!file_exists($file)) {
+    fwrite(STDERR, "Coverage file not found: {$file}\n");
+    exit(1);
+}
+
+$xml = simplexml_load_file($file);
+if ($xml === false) {
+    fwrite(STDERR, "Failed to parse coverage file: {$file}\n");
+    exit(1);
+}
+
+$metrics = $xml->xpath('//project/metrics');
+if ($metrics === false || $metrics === []) {
+    fwrite(STDERR, "No project metrics found in coverage report.\n");
+    exit(1);
+}
+
+$totalStatements = (int) $metrics[0]['statements'];
+$coveredStatements = (int) $metrics[0]['coveredstatements'];
+
+if ($totalStatements === 0) {
+    fwrite(STDERR, "No statements found in coverage report.\n");
+    exit(1);
+}
+
+$percentage = ($coveredStatements / $totalStatements) * 100;
+$percentage = round($percentage, 2);
+
+echo "Line coverage: {$percentage}% ({$coveredStatements}/{$totalStatements})\n";
+
+if ($percentage < $minPercentage) {
+    fwrite(STDERR, "FAIL: Coverage {$percentage}% is below the required {$minPercentage}%\n");
+    exit(1);
+}
+
+echo "Coverage check passed!\n";

@@ -56,6 +56,7 @@
             "@cs",
             "@phpstan",
             "@test",
+            "@coverage",
             "@tsm"
         ],
         "ci-local": [
@@ -66,6 +67,7 @@
             "@cs-fix",
             "@phpstan",
             "@test",
+            "@coverage",
             "@tsm"
         ],
         "composer-validate": "@composer validate --no-check-all --strict",
@@ -76,6 +78,10 @@
         "cs-fix": "php-cs-fixer fix -v",
         "phpstan": "phpstan analyse --no-progress",
         "test": "phpunit",
+        "coverage": [
+            "XDEBUG_MODE=coverage phpunit --testsuite unit --coverage-clover build/coverage/clover.xml",
+            "php utils/check-coverage build/coverage/clover.xml 100"
+        ],
         "tsm": "test-mapper --specs-dir=specs -u"
     },
     "config": {
