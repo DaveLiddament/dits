@@ -87,6 +87,14 @@ final class PhpUnitCoverageXmlParserTest extends TestCase
     }
 
     #[Test]
+    public function skipsMissingFileXml(): void
+    {
+        $report = $this->parser->parse(self::FIXTURES_DIR.'/missing-file', new CommitIdentifier('abc123'), self::SOURCE_PREFIX);
+
+        self::assertCount(0, $report->testCoverages);
+    }
+
+    #[Test]
     public function throwsWhenIndexXmlMissing(): void
     {
         $this->expectException(\InvalidArgumentException::class);

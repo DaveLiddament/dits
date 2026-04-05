@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <build time="Sat Apr 5 12:00:00 UTC 2026" phpunit="13.1.0" coverage="14.0.0">
+    <runtime name="PHP" version="8.5.4" url="https://www.php.net/"/>
+    <driver name="Xdebug" version="3.5.1"/>
+  </build>
+  <project source="/app/src">
+    <tests>
+      <test name="App\Tests\FooTest::bar" size="unknown" status="success" time="0.001"/>
+    </tests>
+    <directory name="/">
+      <totals>
+        <lines total="10" comments="0" code="10" executable="1" executed="1" percent="100.00"/>
+      </totals>
+      <file name="DoesNotExist.php" href="DoesNotExist.php.xml">
+        <totals>
+          <lines total="10" comments="0" code="10" executable="1" executed="1" percent="100.00"/>
+        </totals>
+      </file>
+    </directory>
+  </project>
+</phpunit>

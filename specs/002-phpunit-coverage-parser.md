@@ -10,7 +10,9 @@ We use `--coverage-xml` which produces a directory containing:
 - `index.xml` — lists all tests and per-file XML references
 - Per-file XMLs — contain `<coverage><line nr="X"><covered by="TestName"/></line></coverage>`
 
-File paths in `LineCoverage` are relative to the source root, constructed from the `path` and `name` attributes on the `<file>` element (e.g. `path="/Service/"` + `name="Logger.php"` = `Service/Logger.php`).
+File paths in `LineCoverage` are relative to the project root (git root). The parser takes a `sourcePrefix` parameter (e.g. `src/`) and prepends it to the path constructed from the `path` and `name` attributes on the `<file>` element (e.g. `src/` + `Service/` + `Logger.php` = `src/Service/Logger.php`).
+
+If a per-file XML referenced in `index.xml` is missing, it is silently skipped.
 
 ## Approach
 
