@@ -3,3 +3,4 @@
 /.php-cs-fixer.cache
 /.phpunit.cache/
 /.idea/
+tests/External/Fixtures/.phpunit.result.cache

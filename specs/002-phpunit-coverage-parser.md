@@ -1,0 +1,20 @@
+# PHPUnit coverage parser
+
+Parse PHPUnit `--coverage-xml` output into a `TestCoverageReport`.
+
+PHPUnit can produce per-test line-level coverage data. We need a parser that reads this output and produces a `TestCoverageReport` containing which tests covered which lines of which files.
+
+## Format
+
+We use `--coverage-xml` which produces a directory containing:
+- `index.xml` — lists all tests and per-file XML references
+- Per-file XMLs — contain `<coverage><line nr="X"><covered by="TestName"/></line></coverage>`
+
+File paths in `LineCoverage` are relative to the source root, constructed from the `path` and `name` attributes on the `<file>` element (e.g. `path="/Service/"` + `name="Logger.php"` = `Service/Logger.php`).
+
+## Approach
+
+1. Run PHPUnit with `--coverage-xml` against a project.
+2. Parse `index.xml` to discover per-file XMLs.
+3. Parse each file XML to extract per-test line coverage.
+4. Build a `TestCoverageReport` grouping line coverages by test name.

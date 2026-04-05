@@ -4,7 +4,7 @@ parameters:
         - src
         - tests
     excludePaths:
-        - fixtures
+        - tests/External/Fixtures
     phpLanguageExtensions:
         mode: none
     checkUninitializedProperties: true

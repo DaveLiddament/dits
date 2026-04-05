@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="Greeter.php" path="/">
+    <totals>
+      <lines total="19" comments="0" code="19" executable="2" executed="1" percent="50.00"/>
+    </totals>
+    <coverage>
+      <line nr="11">
+        <covered by="App\Tests\GreeterTest::greet"/>
+      </line>
+    </coverage>
+  </file>
+</phpunit>

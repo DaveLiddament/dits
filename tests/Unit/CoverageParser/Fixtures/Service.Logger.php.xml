@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="Logger.php" path="/Service/">
+    <totals>
+      <lines total="10" comments="0" code="10" executable="1" executed="1" percent="100.00"/>
+    </totals>
+    <coverage>
+      <line nr="8">
+        <covered by="App\Tests\LoggerTest::log"/>
+      </line>
+    </coverage>
+  </file>
+</phpunit>
