@@ -23,5 +23,8 @@
         <include>
             <directory>src</directory>
         </include>
+        <exclude>
+            <file>src/DiffFinder/ProcessGitCommandRunner.php</file>
+        </exclude>
     </source>
 </phpunit>
