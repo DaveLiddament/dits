@@ -45,7 +45,32 @@ final readonly class DiffFinder
             }
         }
 
+        if ($includeUnstaged) {
+            $fileDiffs = [...$fileDiffs, ...$this->getUntrackedFiles()];
+        }
+
         return new Differences($fileDiffs, $lineDiffs);
+    }
+
+    /**
+     * @return list<FileDiff>
+     */
+    private function getUntrackedFiles(): array
+    {
+        $output = $this->gitCommandRunner->run([
+            'ls-files', '--others', '--exclude-standard',
+        ]);
+
+        $fileDiffs = [];
+
+        foreach ($output as $line) {
+            $line = trim($line);
+            if ('' !== $line) {
+                $fileDiffs[] = new FileDiff($line);
+            }
+        }
+
+        return $fileDiffs;
     }
 
     /**

@@ -146,19 +146,23 @@ final class DiffFinderTest extends TestCase
     }
 
     #[Test]
-    public function includeUnstagedTrueUsesDirectBranchRef(): void
+    public function includeUnstagedTrueUsesDirectBranchRefAndChecksUntrackedFiles(): void
     {
         $runner = new StrictFakeGitCommandRunner();
         $runner->addResponse(['diff', '--name-status', '--find-renames', 'main'], ["A\tsrc/Foo.php"]);
+        $runner->addResponse(['ls-files', '--others', '--exclude-standard'], ['src/Untracked.php']);
 
         $diffFinder = new DiffFinder($runner);
         $differences = $diffFinder->find('main', true);
 
-        self::assertCount(1, $differences->fileDiffs);
+        self::assertCount(2, $differences->fileDiffs);
+        $fileNames = array_map(static fn ($fd): string => $fd->fileName, $differences->fileDiffs);
+        sort($fileNames);
+        self::assertSame(['src/Foo.php', 'src/Untracked.php'], $fileNames);
     }
 
     #[Test]
-    public function includeUnstagedFalseUsesBranchDotDotHead(): void
+    public function includeUnstagedFalseDoesNotCheckUntrackedFiles(): void
     {
         $runner = new StrictFakeGitCommandRunner();
         $runner->addResponse(['diff', '--name-status', '--find-renames', 'main..HEAD'], ["A\tsrc/Foo.php"]);
@@ -167,6 +171,34 @@ final class DiffFinderTest extends TestCase
         $differences = $diffFinder->find('main', false);
 
         self::assertCount(1, $differences->fileDiffs);
+    }
+
+    #[Test]
+    public function untrackedFilesAreFileDiffs(): void
+    {
+        $this->gitRunner->addResponse('--name-status', []);
+        $this->gitRunner->addResponse('ls-files', [
+            'src/NewFile.php',
+            'src/AnotherNew.php',
+        ]);
+
+        $differences = $this->diffFinder->find('main', true);
+
+        self::assertCount(2, $differences->fileDiffs);
+        $fileNames = array_map(static fn ($fd): string => $fd->fileName, $differences->fileDiffs);
+        sort($fileNames);
+        self::assertSame(['src/AnotherNew.php', 'src/NewFile.php'], $fileNames);
+    }
+
+    #[Test]
+    public function emptyUntrackedFilesListProducesNoDiffs(): void
+    {
+        $this->gitRunner->addResponse('--name-status', []);
+        $this->gitRunner->addResponse('ls-files', []);
+
+        $differences = $this->diffFinder->find('main', true);
+
+        self::assertCount(0, $differences->fileDiffs);
     }
 
     #[Test]

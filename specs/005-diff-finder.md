@@ -33,8 +33,8 @@ For modified files, parse the unified diff output to find which lines in the **o
 
 ## Git commands
 
-- `includeUnstaged = true`: `git diff --name-status --find-renames <branch>` and `git diff <branch> -- <file>`
-- `includeUnstaged = false`: `git diff --name-status --find-renames <branch>..HEAD` and `git diff <branch>..HEAD -- <file>`
+- `includeUnstaged = true`: `git diff --name-status --find-renames <branch>` and `git diff <branch> -- <file>`, plus `git ls-files --others --exclude-standard` to pick up untracked files as `FileDiff` entries
+- `includeUnstaged = false`: `git diff --name-status --find-renames <branch>..HEAD` and `git diff <branch>..HEAD -- <file>` (no untracked files)
 
 ## Testability
 
