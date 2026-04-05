@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DaveLiddament\TestSelector\Tests\Unit\Diff;
 
 use DaveLiddament\TestSelector\Diff\Changes;
+use DaveLiddament\TestSelector\Diff\Differences;
 use DaveLiddament\TestSelector\Diff\FileDiff;
 use DaveLiddament\TestSelector\Diff\LineDiff;
 use PHPUnit\Framework\Attributes\Test;
@@ -17,10 +18,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function returnsTrueWhenFileMatchesFileDiff(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [new FileDiff('src/Foo.php')],
             [],
-        );
+        ));
 
         self::assertTrue($changes->hasChanged('src/Foo.php', 10));
     }
@@ -28,10 +29,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function returnsTrueForAnyLineWhenFileMatchesFileDiff(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [new FileDiff('src/Foo.php')],
             [],
-        );
+        ));
 
         self::assertTrue($changes->hasChanged('src/Foo.php', 1));
         self::assertTrue($changes->hasChanged('src/Foo.php', 999));
@@ -40,10 +41,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function returnsTrueWhenFileAndLineMatchLineDiff(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [],
             [new LineDiff('src/Foo.php', 42)],
-        );
+        ));
 
         self::assertTrue($changes->hasChanged('src/Foo.php', 42));
     }
@@ -51,10 +52,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function returnsFalseWhenLineDoesNotMatch(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [],
             [new LineDiff('src/Foo.php', 42)],
-        );
+        ));
 
         self::assertFalse($changes->hasChanged('src/Foo.php', 10));
     }
@@ -62,10 +63,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function returnsFalseWhenFileDoesNotMatch(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [],
             [new LineDiff('src/Foo.php', 42)],
-        );
+        ));
 
         self::assertFalse($changes->hasChanged('src/Bar.php', 42));
     }
@@ -73,7 +74,7 @@ final class ChangesTest extends TestCase
     #[Test]
     public function returnsFalseWhenNoChanges(): void
     {
-        $changes = new Changes([], []);
+        $changes = new Changes(new Differences([], []));
 
         self::assertFalse($changes->hasChanged('src/Foo.php', 10));
     }
@@ -81,10 +82,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function fileDiffTakesPriorityOverLineDiff(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [new FileDiff('src/Foo.php')],
             [new LineDiff('src/Foo.php', 42)],
-        );
+        ));
 
         // Returns true via FileDiff even for a line not in LineDiff
         self::assertTrue($changes->hasChanged('src/Foo.php', 99));
@@ -93,10 +94,10 @@ final class ChangesTest extends TestCase
     #[Test]
     public function matchesCorrectFileAmongMultiple(): void
     {
-        $changes = new Changes(
+        $changes = new Changes(new Differences(
             [new FileDiff('src/Foo.php')],
             [new LineDiff('src/Bar.php', 10)],
-        );
+        ));
 
         self::assertTrue($changes->hasChanged('src/Foo.php', 1));
         self::assertTrue($changes->hasChanged('src/Bar.php', 10));
