@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaveLiddament\TestSelector\Command;
 
+use DaveLiddament\TestSelector\Config\ConfigLoader;
 use DaveLiddament\TestSelector\Coverage\CommitIdentifier;
 use DaveLiddament\TestSelector\CoverageParser\PhpUnitCoverageXmlParser;
 use DaveLiddament\TestSelector\Serializer\TestCoverageReportSerializer;
@@ -23,6 +24,7 @@ final class GenerateTcrCommand extends Command
     public function __construct(
         private readonly PhpUnitCoverageXmlParser $parser = new PhpUnitCoverageXmlParser(),
         private readonly TestCoverageReportSerializer $serializer = new TestCoverageReportSerializer(),
+        private readonly ConfigLoader $configLoader = new ConfigLoader(),
     ) {
         parent::__construct();
     }
@@ -40,7 +42,6 @@ final class GenerateTcrCommand extends Command
             's',
             InputOption::VALUE_REQUIRED,
             'Source directory relative to project root',
-            'src/',
         );
 
         $this->addOption(
@@ -49,20 +50,38 @@ final class GenerateTcrCommand extends Command
             InputOption::VALUE_REQUIRED,
             'Commit SHA to record (defaults to git rev-parse HEAD)',
         );
+
+        $this->addOption(
+            'config',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Path to config file (defaults to .dits.php in project root)',
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string|null $configPath */
+        $configPath = $input->getOption('config');
+
+        try {
+            $config = $this->configLoader->load($configPath);
+        } catch (\Throwable $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            return Command::FAILURE;
+        }
+
         /** @var string $coverageXmlDir */
         $coverageXmlDir = $input->getArgument('coverage-xml-dir');
 
-        /** @var string $sourceDir */
-        $sourceDir = $input->getOption('source-dir');
+        /** @var string|null $sourceDirOption */
+        $sourceDirOption = $input->getOption('source-dir');
+        $sourceDir = $sourceDirOption ?? $config->getSourceDir();
 
         /** @var string|null $commitOption */
         $commitOption = $input->getOption('commit');
-
-        $commitSha = $commitOption ?? $this->resolveCommitFromGit();
+        $commitSha = $commitOption ?? $config->getCommit() ?? $this->resolveCommitFromGit();
 
         $commitIdentifier = new CommitIdentifier($commitSha);
         $report = $this->parser->parse($coverageXmlDir, $commitIdentifier, $sourceDir);

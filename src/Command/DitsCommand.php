@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace DaveLiddament\TestSelector\Command;
 
+use DaveLiddament\TestSelector\Config\ConfigLoader;
 use DaveLiddament\TestSelector\Coverage\TestName;
 use DaveLiddament\TestSelector\Diff\Changes;
 use DaveLiddament\TestSelector\DiffFinder\DiffFinder;
@@ -33,6 +34,7 @@ final class DitsCommand extends Command
         private readonly ?GitCommandRunner $gitCommandRunner = null,
         private readonly TestCoverageReportSerializer $serializer = new TestCoverageReportSerializer(),
         private readonly TestSelector $testSelector = new TestSelector(),
+        private readonly ConfigLoader $configLoader = new ConfigLoader(),
         private readonly ?string $stdinOverride = null,
     ) {
         parent::__construct();
@@ -52,12 +54,29 @@ final class DitsCommand extends Command
             'f',
             InputOption::VALUE_REQUIRED,
             'Output format: list, phpunit-filter, json',
-            'list',
+        );
+
+        $this->addOption(
+            'config',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'Path to config file (defaults to .dits.php in project root)',
         );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        /** @var string|null $configPath */
+        $configPath = $input->getOption('config');
+
+        try {
+            $config = $this->configLoader->load($configPath);
+        } catch (\Throwable $e) {
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+
+            return self::EXIT_INPUT_ERROR;
+        }
+
         $stdinContent = $this->readStdin();
 
         if ('' === $stdinContent) {
@@ -74,7 +93,9 @@ final class DitsCommand extends Command
             return self::EXIT_INPUT_ERROR;
         }
 
-        $includeUnstaged = (bool) $input->getOption('include-unstaged');
+        // CLI --include-unstaged flag overrides config (flag present = true)
+        $includeUnstaged = true === $input->getOption('include-unstaged') || $config->isIncludeUnstaged();
+
         $commitRef = $report->commitIdentifier->identifier;
 
         $gitRunner = $this->gitCommandRunner ?? new ProcessGitCommandRunner((string) getcwd());
@@ -91,8 +112,10 @@ final class DitsCommand extends Command
         $changes = new Changes($differences);
         $selectedTests = $this->testSelector->selectTests($report, $changes);
 
-        /** @var string $format */
-        $format = $input->getOption('format');
+        // CLI --format overrides config
+        /** @var string|null $formatOption */
+        $formatOption = $input->getOption('format');
+        $format = $formatOption ?? $config->getFormat();
 
         $this->writeOutput($output, $selectedTests, $format);
 
