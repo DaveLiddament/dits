@@ -36,4 +36,23 @@ final class DifferencesTest extends TestCase
         self::assertSame([], $differences->fileDiffs);
         self::assertSame([], $differences->lineDiffs);
     }
+
+    #[Test]
+    public function preservesMultipleDiffsAsLists(): void
+    {
+        $fileDiffs = [
+            new FileDiff('src/Foo.php'),
+            new FileDiff('src/Bar.php'),
+        ];
+        $lineDiffs = [
+            new LineDiff('src/Baz.php', 1),
+            new LineDiff('src/Qux.php', 2),
+            new LineDiff('src/Qux.php', 3),
+        ];
+
+        $differences = new Differences($fileDiffs, $lineDiffs);
+
+        self::assertCount(2, $differences->fileDiffs);
+        self::assertCount(3, $differences->lineDiffs);
+    }
 }

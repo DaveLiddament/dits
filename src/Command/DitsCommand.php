@@ -6,7 +6,6 @@ namespace DaveLiddament\TestSelector\Command;
 
 use DaveLiddament\TestSelector\Config\ConfigLoader;
 use DaveLiddament\TestSelector\Coverage\TestName;
-use DaveLiddament\TestSelector\Diff\Changes;
 use DaveLiddament\TestSelector\DiffFinder\DiffFinder;
 use DaveLiddament\TestSelector\DiffFinder\GitCommandRunner;
 use DaveLiddament\TestSelector\DiffFinder\ProcessGitCommandRunner;
@@ -118,8 +117,7 @@ final class DitsCommand extends Command
             return self::EXIT_GIT_ERROR;
         }
 
-        $changes = new Changes($differences);
-        $selectedTests = $this->testSelector->selectTests($report, $changes);
+        $selectedTests = $this->testSelector->selectTests($report, $differences);
 
         // CLI --format overrides config
         /** @var string|null $formatOption */

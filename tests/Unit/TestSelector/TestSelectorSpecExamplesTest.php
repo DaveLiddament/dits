@@ -9,7 +9,6 @@ use DaveLiddament\TestSelector\Coverage\LineCoverage;
 use DaveLiddament\TestSelector\Coverage\TestCoverage;
 use DaveLiddament\TestSelector\Coverage\TestCoverageReport;
 use DaveLiddament\TestSelector\Coverage\TestName;
-use DaveLiddament\TestSelector\Diff\Changes;
 use DaveLiddament\TestSelector\DiffFinder\DiffFinder;
 use DaveLiddament\TestSelector\Tests\Unit\DiffFinder\DiffFixtureGenerator;
 use DaveLiddament\TestSelector\Tests\Unit\DiffFinder\FakeGitCommandRunner;
@@ -94,10 +93,9 @@ final class TestSelectorSpecExamplesTest extends TestCase
     {
         $report = $this->buildCoverageReport();
         $differences = $this->buildDifferences($afterFixture);
-        $changes = new Changes($differences);
 
         $selector = new TestSelector();
-        $selected = $selector->selectTests($report, $changes);
+        $selected = $selector->selectTests($report, $differences);
 
         $selectedNames = array_map(static fn (TestName $t): string => $t->testName, $selected);
         sort($selectedNames);

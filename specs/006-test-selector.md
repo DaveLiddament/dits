@@ -1,15 +1,20 @@
 # Test Selector
 
-Given a `TestCoverageReport` and a `Changes` object, determine which tests need to run.
+Given a `TestCoverageReport` and a `Differences` object, determine which tests need to run.
 
 ## Logic
 
-For each test in the coverage report:
-1. Iterate through its `LineCoverage` entries.
-2. For each entry, ask `Changes::hasChanged(fileName, lineNumber)`.
-3. If any returns `true`, select that test (short-circuit to the next test).
+Build inverse indexes from the coverage report (one pass through the coverage data):
+- `fileToTests` — file name → set of tests covering any line in that file
+- `fileLineToTests` — file name + line number → set of tests covering that exact line
 
-Returns the list of `TestName` for tests that need to run.
+Then iterate the diffs:
+1. For each `FileDiff`, union the result with all tests covering that file.
+2. For each `LineDiff`, union the result with all tests covering line, line-1, and line+1 (the ±1 fuzz catches insertions and changes to adjacent non-executable lines).
+
+Returns the list of `TestName` for tests that need to run, deduplicated.
+
+This is the inverse of the naive approach — we iterate the (small) diff and look up affected tests, rather than iterating every coverage entry to check if it's affected. This scales with diff size rather than coverage size.
 
 
 

@@ -9,7 +9,6 @@ use DaveLiddament\TestSelector\Coverage\LineCoverage;
 use DaveLiddament\TestSelector\Coverage\TestCoverage;
 use DaveLiddament\TestSelector\Coverage\TestCoverageReport;
 use DaveLiddament\TestSelector\Coverage\TestName;
-use DaveLiddament\TestSelector\Diff\Changes;
 use DaveLiddament\TestSelector\Diff\Differences;
 use DaveLiddament\TestSelector\Diff\FileDiff;
 use DaveLiddament\TestSelector\Diff\LineDiff;
@@ -38,9 +37,9 @@ final class TestSelectorTest extends TestCase
                 new LineCoverage('src/Foo.php', 10),
             ),
         );
-        $changes = new Changes(new Differences([], []));
+        $differences = new Differences([], []);
 
-        $selected = $this->selector->selectTests($report, $changes);
+        $selected = $this->selector->selectTests($report, $differences);
 
         self::assertSame([], $selected);
     }
@@ -56,12 +55,12 @@ final class TestSelectorTest extends TestCase
                 new LineCoverage('src/Foo.php', 11),
             ),
         );
-        $changes = new Changes(new Differences(
+        $differences = new Differences(
             [],
             [new LineDiff('src/Foo.php', 10)],
-        ));
+        );
 
-        $selected = $this->selector->selectTests($report, $changes);
+        $selected = $this->selector->selectTests($report, $differences);
 
         self::assertCount(1, $selected);
         self::assertSame('App\\Tests\\FooTest::testBar', $selected[0]->testName);
@@ -85,12 +84,12 @@ final class TestSelectorTest extends TestCase
                 new LineCoverage('src/Bar.php', 5),
             ),
         );
-        $changes = new Changes(new Differences(
+        $differences = new Differences(
             [new FileDiff('src/Foo.php')],
             [],
-        ));
+        );
 
-        $selected = $this->selector->selectTests($report, $changes);
+        $selected = $this->selector->selectTests($report, $differences);
 
         self::assertCount(2, $selected);
         $names = array_map(static fn (TestName $t): string => $t->testName, $selected);
@@ -115,15 +114,15 @@ final class TestSelectorTest extends TestCase
                 new LineCoverage('src/Bar.php', 5),
             ),
         );
-        $changes = new Changes(new Differences(
+        $differences = new Differences(
             [],
             [
                 new LineDiff('src/Foo.php', 10),
                 new LineDiff('src/Bar.php', 5),
             ],
-        ));
+        );
 
-        $selected = $this->selector->selectTests($report, $changes);
+        $selected = $this->selector->selectTests($report, $differences);
 
         self::assertCount(2, $selected);
     }
@@ -138,12 +137,12 @@ final class TestSelectorTest extends TestCase
                 new LineCoverage('src/Foo.php', 10),
             ),
         );
-        $changes = new Changes(new Differences(
+        $differences = new Differences(
             [],
             [new LineDiff('src/Other.php', 99)],
-        ));
+        );
 
-        $selected = $this->selector->selectTests($report, $changes);
+        $selected = $this->selector->selectTests($report, $differences);
 
         self::assertSame([], $selected);
     }
@@ -157,12 +156,12 @@ final class TestSelectorTest extends TestCase
                 new TestName('App\\Tests\\EmptyTest::testNothing'),
             ),
         );
-        $changes = new Changes(new Differences(
+        $differences = new Differences(
             [new FileDiff('src/Foo.php')],
             [],
-        ));
+        );
 
-        $selected = $this->selector->selectTests($report, $changes);
+        $selected = $this->selector->selectTests($report, $differences);
 
         self::assertSame([], $selected);
     }
