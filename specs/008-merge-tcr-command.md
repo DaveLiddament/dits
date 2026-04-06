@@ -18,3 +18,7 @@ Shell glob expansion works: `bin/merge-tcr coverage/*.json`
 ## Output
 
 Streams the merged TCR as JSON to stdout. The merged report contains all `testCoverages` from every input file, under the shared `commitIdentifier`.
+
+## Errors
+
+If any input file is missing, unreadable, or contains an unsupported TCR version, the command fails with exit code 1 and prints a clear error message identifying the offending file.

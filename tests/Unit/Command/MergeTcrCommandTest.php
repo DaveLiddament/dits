@@ -93,4 +93,20 @@ final class MergeTcrCommandTest extends TestCase
 
         self::assertSame(1, $this->commandTester->getStatusCode());
     }
+
+    #[Test]
+    public function failsWithClearErrorWhenTcrVersionUnsupported(): void
+    {
+        $this->commandTester->execute([
+            'tcr-files' => [
+                self::FIXTURES.'/tcr1.json',
+                self::FIXTURES.'/tcr_bad_version.json',
+            ],
+        ]);
+
+        self::assertSame(1, $this->commandTester->getStatusCode());
+        self::assertStringContainsString('Failed to parse', $this->commandTester->getDisplay());
+        self::assertStringContainsString('tcr_bad_version.json', $this->commandTester->getDisplay());
+        self::assertStringContainsString('Unsupported TCR version 99', $this->commandTester->getDisplay());
+    }
 }

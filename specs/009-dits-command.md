@@ -32,5 +32,5 @@ JSON array of test name strings.
 ## Exit codes
 
 - **0** — success (tests selected, or no tests to run)
-- **1** — input error (invalid TCR JSON, empty stdin)
+- **1** — input error (invalid TCR JSON, empty stdin, unsupported TCR version). The underlying error message is included in the output.
 - **2** — git error (diff failed, or commit not found in local repo)

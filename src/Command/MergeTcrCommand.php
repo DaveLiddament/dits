@@ -61,7 +61,13 @@ final class MergeTcrCommand extends Command
                 return Command::FAILURE;
             }
 
-            $reports[] = $this->serializer->fromJson($json);
+            try {
+                $reports[] = $this->serializer->fromJson($json);
+            } catch (\Throwable $e) {
+                $output->writeln(sprintf('<error>Failed to parse %s: %s</error>', $file, $e->getMessage()));
+
+                return Command::FAILURE;
+            }
         }
 
         try {

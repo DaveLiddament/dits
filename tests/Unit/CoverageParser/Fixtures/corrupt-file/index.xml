@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <project source="/app/src">
+    <directory name="/">
+      <file name="Broken.php" href="Broken.php.xml"/>
+    </directory>
+  </project>
+</phpunit>

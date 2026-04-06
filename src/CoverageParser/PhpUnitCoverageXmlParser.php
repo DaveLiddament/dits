@@ -24,7 +24,7 @@ final readonly class PhpUnitCoverageXmlParser
         $indexPath = $coverageXmlDir.'/index.xml';
         Assert::fileExists($indexPath, 'Coverage XML directory must contain index.xml');
 
-        $indexXml = new \SimpleXMLElement($this->readFile($indexPath));
+        $indexXml = $this->loadXml($indexPath);
         $indexXml->registerXPathNamespace('p', 'https://schema.phpunit.de/coverage/1.0');
 
         /** @var array<string, list<LineCoverage>> $testLineCoverages */
@@ -60,7 +60,7 @@ final readonly class PhpUnitCoverageXmlParser
      */
     private function parseFileXml(string $filePath, string $sourcePrefix, array &$testLineCoverages): void
     {
-        $fileXml = new \SimpleXMLElement($this->readFile($filePath));
+        $fileXml = $this->loadXml($filePath);
         $fileXml->registerXPathNamespace('p', 'https://schema.phpunit.de/coverage/1.0');
 
         $fileElements = $this->xpath($fileXml, '//p:file');
@@ -103,5 +103,26 @@ final readonly class PhpUnitCoverageXmlParser
         Assert::notFalse($content, sprintf('Failed to read file: %s', $path));
 
         return $content;
+    }
+
+    private function loadXml(string $path): \SimpleXMLElement
+    {
+        $content = $this->readFile($path);
+
+        $previousUseInternalErrors = libxml_use_internal_errors(true);
+
+        try {
+            $xml = new \SimpleXMLElement($content);
+        } catch (\Throwable $e) {
+            $errors = libxml_get_errors();
+            libxml_clear_errors();
+            $errorMessage = '' !== $e->getMessage() ? $e->getMessage() : (isset($errors[0]) ? trim($errors[0]->message) : 'unknown error');
+
+            throw new \InvalidArgumentException(sprintf('Failed to parse coverage XML file %s: %s', $path, $errorMessage), 0, $e);
+        } finally {
+            libxml_use_internal_errors($previousUseInternalErrors);
+        }
+
+        return $xml;
     }
 }

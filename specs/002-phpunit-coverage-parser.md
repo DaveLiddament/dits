@@ -14,6 +14,10 @@ File paths in `LineCoverage` are relative to the project root (git root). The pa
 
 If a per-file XML referenced in `index.xml` is missing, it is silently skipped.
 
+## Error handling
+
+If `index.xml` or any per-file XML is malformed, the parser throws `InvalidArgumentException` with a clear message identifying which file failed to parse.
+
 ## Approach
 
 1. Run PHPUnit with `--coverage-xml` against a project.

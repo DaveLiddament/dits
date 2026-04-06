@@ -95,6 +95,26 @@ final class PhpUnitCoverageXmlParserTest extends TestCase
     }
 
     #[Test]
+    public function throwsOnCorruptIndexXml(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Failed to parse coverage XML file');
+        $this->expectExceptionMessage('corrupt-index/index.xml');
+
+        $this->parser->parse(self::FIXTURES_DIR.'/corrupt-index', new CommitIdentifier('abc123'), self::SOURCE_PREFIX);
+    }
+
+    #[Test]
+    public function throwsOnCorruptFileXml(): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Failed to parse coverage XML file');
+        $this->expectExceptionMessage('corrupt-file/Broken.php.xml');
+
+        $this->parser->parse(self::FIXTURES_DIR.'/corrupt-file', new CommitIdentifier('abc123'), self::SOURCE_PREFIX);
+    }
+
+    #[Test]
     public function throwsWhenIndexXmlMissing(): void
     {
         $this->expectException(\InvalidArgumentException::class);

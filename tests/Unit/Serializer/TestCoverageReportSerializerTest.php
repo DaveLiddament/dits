@@ -89,4 +89,60 @@ final class TestCoverageReportSerializerTest extends TestCase
         self::assertSame('abc123', $deserialized->commitIdentifier->identifier);
         self::assertCount(0, $deserialized->testCoverages);
     }
+
+    #[Test]
+    public function toJsonIncludesVersionField(): void
+    {
+        $report = new TestCoverageReport(new CommitIdentifier('abc123'));
+
+        $json = $this->serializer->toJson($report);
+        $decoded = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);
+
+        self::assertIsArray($decoded);
+        self::assertSame(1, $decoded['version']);
+    }
+
+    #[Test]
+    public function fromJsonRejectsMissingVersion(): void
+    {
+        $json = json_encode(['commitIdentifier' => 'abc123', 'testCoverages' => []]);
+        self::assertNotFalse($json);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('missing required "version" field');
+
+        $this->serializer->fromJson($json);
+    }
+
+    #[Test]
+    public function fromJsonRejectsUnknownVersion(): void
+    {
+        $json = json_encode([
+            'version' => 99,
+            'commitIdentifier' => 'abc123',
+            'testCoverages' => [],
+        ]);
+        self::assertNotFalse($json);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported TCR version 99');
+
+        $this->serializer->fromJson($json);
+    }
+
+    #[Test]
+    public function fromJsonRejectsNonIntegerVersion(): void
+    {
+        $json = json_encode([
+            'version' => 'one',
+            'commitIdentifier' => 'abc123',
+            'testCoverages' => [],
+        ]);
+        self::assertNotFalse($json);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('"version" must be an integer');
+
+        $this->serializer->fromJson($json);
+    }
 }

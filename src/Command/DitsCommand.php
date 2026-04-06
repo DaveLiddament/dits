@@ -87,8 +87,8 @@ final class DitsCommand extends Command
 
         try {
             $report = $this->serializer->fromJson($stdinContent);
-        } catch (\Throwable) {
-            $output->writeln('<error>Failed to parse TCR JSON from stdin.</error>');
+        } catch (\Throwable $e) {
+            $output->writeln(sprintf('<error>Failed to parse TCR JSON from stdin: %s</error>', $e->getMessage()));
 
             return self::EXIT_INPUT_ERROR;
         }
