@@ -93,3 +93,17 @@ app/require-checker: ## Check for missing composer requirements
 
 app/composer-validate: ## Validate composer.json
 	@$(APP_EXEC) composer composer-validate
+
+## —— Multi-PHP CI ————————————————————————————————————————————————————————————
+.PHONY: app/ci-83 app/ci-84 app/ci-85 app/ci-all
+
+app/ci-83: ## Run CI against PHP 8.3
+	@$(DOCKER_COMP) run --rm app-php83 sh -c "composer setup && composer ci"
+
+app/ci-84: ## Run CI against PHP 8.4
+	@$(DOCKER_COMP) run --rm app-php84 sh -c "composer setup && composer ci"
+
+app/ci-85: ## Run CI against PHP 8.5
+	@$(DOCKER_COMP) run --rm app-php85 sh -c "composer setup && composer ci"
+
+app/ci-all: app/ci-83 app/ci-84 app/ci-85 ## Run CI against all supported PHP versions

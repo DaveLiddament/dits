@@ -10,9 +10,12 @@ RUN apt-get update && apt-get install -y \
     bcmath \
     intl \
     zip \
-    && pecl install xdebug \
-    && docker-php-ext-enable xdebug \
     && rm -rf /var/lib/apt/lists/*
+
+ARG XDEBUG_ENABLED=1
+RUN if [ "$XDEBUG_ENABLED" = "1" ]; then \
+        pecl install xdebug && docker-php-ext-enable xdebug; \
+    fi
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 ENV XDEBUG_MODE=debug

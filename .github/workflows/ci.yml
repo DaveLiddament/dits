@@ -8,35 +8,33 @@ on:
 
 jobs:
   ci:
-    name: CI
+    name: "PHP ${{ matrix.php-version }}"
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php-version: ['8.3', '8.4', '8.5']
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.5'
-          extensions: bcmath, intl, zip, simplexml
+          php-version: ${{ matrix.php-version }}
+          extensions: bcmath, intl, zip, simplexml, libxml
           tools: composer:v2
           coverage: xdebug
 
-      - name: Get Composer cache directory
-        id: composer-cache
-        run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
-
-      - name: Cache Composer dependencies
-        uses: actions/cache@v4
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('composer.lock', 'vendor-bin/*/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
       - name: Install dependencies
-        run: composer setup
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+
+      - name: Install vendor-bin tools
+        run: composer bin all install
 
       - name: Run CI checks
         run: composer ci

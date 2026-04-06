@@ -176,7 +176,7 @@ The approach is intentionally conservative — it may select a few extra tests, 
 
 ## Requirements
 
-- PHP 8.5+
+- PHP 8.3, 8.4, or 8.5
 - PHPUnit (for coverage collection)
 - Xdebug or PCOV (for line-level coverage)
 - Git

@@ -4,14 +4,8 @@
     "license": "MIT",
     "type": "library",
     "bin": ["bin/generate-tcr", "bin/merge-tcr", "bin/dits"],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "https://github.com/DaveLiddament/test-mapper"
-        }
-    ],
     "require": {
-        "php": ">=8.5 <8.6",
+        "php": "8.3.*|8.4.*|8.5.*",
         "ext-libxml": "*",
         "ext-simplexml": "*",
         "dave-liddament/php-language-extensions": "^0.10.0",
@@ -37,8 +31,7 @@
         "dave-liddament/phpstan-php-language-extensions": "*",
         "spaze/phpstan-disallowed-calls": "*",
         "rector/rector": "*",
-        "phpunit/phpunit": "*",
-        "dave-liddament/test-mapper": "dev-main"
+        "phpunit/phpunit": "*"
     },
     "extra": {
         "bamarni-bin": {
@@ -90,6 +83,9 @@
     "config": {
         "allow-plugins": {
             "bamarni/composer-bin-plugin": true
+        },
+        "platform": {
+            "php": "8.3.0"
         }
     }
 }
