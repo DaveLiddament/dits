@@ -47,6 +47,29 @@ final class TestCoverageReportMergerTest extends TestCase
     }
 
     #[Test]
+    public function mergesAllTestCoveragesFromEachReport(): void
+    {
+        // Each report has multiple test coverages — merger must include ALL of them, not just the first
+        $commit = new CommitIdentifier('abc123');
+
+        $report1 = new TestCoverageReport(
+            $commit,
+            new TestCoverage(new TestName('Report1Test1'), new LineCoverage('src/A.php', 1)),
+            new TestCoverage(new TestName('Report1Test2'), new LineCoverage('src/A.php', 2)),
+            new TestCoverage(new TestName('Report1Test3'), new LineCoverage('src/A.php', 3)),
+        );
+        $report2 = new TestCoverageReport(
+            $commit,
+            new TestCoverage(new TestName('Report2Test1'), new LineCoverage('src/B.php', 1)),
+            new TestCoverage(new TestName('Report2Test2'), new LineCoverage('src/B.php', 2)),
+        );
+
+        $merged = $this->merger->merge([$report1, $report2]);
+
+        self::assertCount(5, $merged->testCoverages);
+    }
+
+    #[Test]
     public function mergesThreeReports(): void
     {
         $commit = new CommitIdentifier('abc123');

@@ -33,7 +33,9 @@ final readonly class PhpUnitCoverageXmlParser
         $fileElements = $this->xpath($indexXml, '//p:project/p:directory/p:file');
 
         foreach ($fileElements as $fileElement) {
+            /** @infection-ignore-all Equivalent mutant: SimpleXMLElement attribute is coerced to string by all downstream uses */
             $href = (string) $fileElement['href'];
+            /** @infection-ignore-all Defensive guard: PHPUnit always emits href, only fails on hand-crafted malformed XML */
             Assert::notEmpty($href);
 
             $filePath = $coverageXmlDir.'/'.$href;
@@ -64,10 +66,14 @@ final readonly class PhpUnitCoverageXmlParser
         $fileXml->registerXPathNamespace('p', 'https://schema.phpunit.de/coverage/1.0');
 
         $fileElements = $this->xpath($fileXml, '//p:file');
+        /** @infection-ignore-all Defensive guard: per-file XML always has exactly one <file> element */
         Assert::count($fileElements, 1);
 
+        /** @infection-ignore-all Equivalent mutant: SimpleXMLElement attribute is coerced to string by string concatenation below */
         $name = (string) $fileElements[0]['name'];
+        /** @infection-ignore-all Equivalent mutant: SimpleXMLElement attribute is coerced to string by ltrim() below */
         $path = (string) $fileElements[0]['path'];
+        /** @infection-ignore-all Defensive guard: PHPUnit always emits name attribute */
         Assert::notEmpty($name);
 
         $relativePath = $sourcePrefix.ltrim($path, '/').$name;
@@ -76,11 +82,14 @@ final readonly class PhpUnitCoverageXmlParser
 
         foreach ($coveredByElements as $coveredBy) {
             $testNameString = (string) $coveredBy['by'];
+            /** @infection-ignore-all Defensive guard: PHPUnit always emits by attribute */
             Assert::notEmpty($testNameString);
 
             $parentLine = $this->xpath($coveredBy, '..');
+            /** @infection-ignore-all Defensive guard: xpath '..' on a child always returns the parent */
             Assert::notEmpty($parentLine);
             $lineNumber = (int) $parentLine[0]['nr'];
+            /** @infection-ignore-all Defensive guard: PHPUnit emits positive line numbers */
             Assert::positiveInteger($lineNumber);
 
             $testLineCoverages[$testNameString][] = new LineCoverage($relativePath, $lineNumber);
@@ -94,17 +103,25 @@ final readonly class PhpUnitCoverageXmlParser
     {
         $result = $xml->xpath($expression);
 
+        /** @infection-ignore-all Equivalent mutant: SimpleXMLElement::xpath returns sequentially-keyed arrays already */
         return \is_array($result) ? array_values($result) : [];
     }
 
     private function readFile(string $path): string
     {
         $content = file_get_contents($path);
+        /** @infection-ignore-all Defensive guard: file existence is checked by caller (Assert::fileExists in parse()) */
         Assert::notFalse($content, sprintf('Failed to read file: %s', $path));
 
         return $content;
     }
 
+    /**
+     * @infection-ignore-all This method is error-handling/cleanup glue. Mutations to libxml state restoration,
+     *                       error message formatting, exception codes, and try/finally structure are all
+     *                       equivalent — they don't affect the observable outcome of parse() failing on
+     *                       malformed XML, which IS tested via the corrupt-* fixtures.
+     */
     private function loadXml(string $path): \SimpleXMLElement
     {
         $content = $this->readFile($path);

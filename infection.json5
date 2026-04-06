@@ -1,0 +1,23 @@
+{
+    "$schema": "vendor-bin/infection/vendor/infection/infection/resources/schema.json",
+    "source": {
+        "directories": [
+            "src"
+        ],
+        "excludes": [
+            "Command",
+            "DiffFinder/ProcessGitCommandRunner.php"
+        ]
+    },
+    "logs": {
+        "text": "build/infection/infection.log",
+        "html": "build/infection/infection.html",
+        "summary": "build/infection/summary.log"
+    },
+    "tmpDir": "build/infection/tmp",
+    "minMsi": 100,
+    "minCoveredMsi": 100,
+    "testFramework": "phpunit",
+    "testFrameworkOptions": "--testsuite=unit",
+    "staticAnalysisToolOptions": "--memory-limit=-1"
+}

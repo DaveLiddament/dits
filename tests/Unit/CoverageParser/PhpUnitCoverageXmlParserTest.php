@@ -95,6 +95,21 @@ final class PhpUnitCoverageXmlParserTest extends TestCase
     }
 
     #[Test]
+    public function continuesProcessingAfterMissingFile(): void
+    {
+        // index.xml lists Missing.php (no XML file) followed by Calculator.php (has XML).
+        // The missing one should be skipped via continue, NOT break the loop.
+        $report = $this->parser->parse(
+            self::FIXTURES_DIR.'/missing-then-existing',
+            new CommitIdentifier('abc123'),
+            self::SOURCE_PREFIX,
+        );
+
+        self::assertCount(1, $report->testCoverages);
+        self::assertSame('App\Tests\CalculatorTest::add', $report->testCoverages[0]->testName->testName);
+    }
+
+    #[Test]
     public function throwsOnCorruptIndexXml(): void
     {
         $this->expectException(\InvalidArgumentException::class);

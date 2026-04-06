@@ -38,3 +38,31 @@ jobs:
 
       - name: Run CI checks
         run: composer ci
+
+  infection:
+    name: "Infection (PHP 8.5)"
+    runs-on: ubuntu-latest
+    needs: ci
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: bcmath, intl, zip, simplexml, libxml
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Install dependencies
+        uses: ramsey/composer-install@v3
+        with:
+          dependency-versions: locked
+
+      - name: Install vendor-bin tools
+        run: composer bin all install
+
+      - name: Run infection
+        run: composer infection

@@ -15,6 +15,7 @@ final class ConfigLoader
     public function __construct(
         ?string $projectRoot = null,
     ) {
+        /** @infection-ignore-all Equivalent mutant: getcwd() returns string in normal operation; cast handles edge case where it returns false */
         $this->projectRoot = $projectRoot ?? (string) getcwd();
     }
 

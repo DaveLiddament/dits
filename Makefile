@@ -94,6 +94,9 @@ app/require-checker: ## Check for missing composer requirements
 app/composer-validate: ## Validate composer.json
 	@$(APP_EXEC) composer composer-validate
 
+app/infection: ## Run infection mutation testing
+	@$(APP_EXEC) composer infection
+
 ## —— Multi-PHP CI ————————————————————————————————————————————————————————————
 .PHONY: app/ci-83 app/ci-84 app/ci-85 app/ci-all
 

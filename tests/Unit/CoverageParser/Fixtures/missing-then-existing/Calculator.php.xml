@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <file name="Calculator.php" path="/">
+    <coverage>
+      <line nr="11">
+        <covered by="App\Tests\CalculatorTest::add"/>
+      </line>
+    </coverage>
+  </file>
+</phpunit>

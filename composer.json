@@ -78,7 +78,8 @@
             "XDEBUG_MODE=coverage phpunit --testsuite unit --coverage-clover build/coverage/clover.xml",
             "php utils/check-coverage build/coverage/clover.xml 100"
         ],
-        "tsm": "test-mapper --specs-dir=specs -u"
+        "tsm": "test-mapper --specs-dir=specs -u",
+        "infection": "XDEBUG_MODE=coverage infection --threads=max --show-mutations"
     },
     "config": {
         "allow-plugins": {

@@ -27,7 +27,7 @@ Uses `git diff --name-status --find-renames` to classify each changed file:
 For modified files, parse the unified diff output to find which lines in the **original** file were changed or removed:
 
 - Hunk headers (`@@ -old,count +new,count @@`) give the starting line number in the old file
-- Lines starting with `-` are removed/changed lines → produce a `LineDiff`
+- Lines starting with `-` (but not `---`, which is a file header) are removed/changed lines → produce a `LineDiff`
 - Lines starting with `+` are additions → produce a `LineDiff` at the current old line position (deduplicated for consecutive insertions). This captures where in the original file the insertion occurred.
 - Uses `--unified=0` so no context lines appear
 

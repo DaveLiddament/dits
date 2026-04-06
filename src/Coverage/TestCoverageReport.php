@@ -13,6 +13,7 @@ readonly class TestCoverageReport
         public CommitIdentifier $commitIdentifier,
         TestCoverage ...$testCoverages,
     ) {
+        /** @infection-ignore-all Equivalent mutant: variadic args are always sequentially keyed; array_values is a no-op but kept for type narrowing */
         $this->testCoverages = array_values($testCoverages);
     }
 }

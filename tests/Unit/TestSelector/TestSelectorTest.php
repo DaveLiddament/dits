@@ -165,4 +165,96 @@ final class TestSelectorTest extends TestCase
 
         self::assertSame([], $selected);
     }
+
+    #[Test]
+    public function continuesProcessingLineDiffsAfterUnknownFile(): void
+    {
+        // First lineDiff is for an unknown file, second matches a covered line.
+        // Verifies the loop uses `continue`, not `break`.
+        $report = new TestCoverageReport(
+            new CommitIdentifier('abc123'),
+            new TestCoverage(
+                new TestName('App\\Tests\\FooTest::testBar'),
+                new LineCoverage('src/Foo.php', 10),
+            ),
+        );
+        $differences = new Differences(
+            [],
+            [
+                new LineDiff('src/Unknown.php', 1),
+                new LineDiff('src/Foo.php', 10),
+            ],
+        );
+
+        $selected = $this->selector->selectTests($report, $differences);
+
+        self::assertCount(1, $selected);
+        self::assertSame('App\\Tests\\FooTest::testBar', $selected[0]->testName);
+    }
+
+    #[Test]
+    public function fuzzMatchesExactlyOneLineAbove(): void
+    {
+        // Coverage at line 11 only, lineDiff at line 10. Fuzz +1 should catch it.
+        // Mutating +1 to +2 would make us look at line 12, missing the match.
+        $report = new TestCoverageReport(
+            new CommitIdentifier('abc123'),
+            new TestCoverage(
+                new TestName('App\\Tests\\FooTest::testBar'),
+                new LineCoverage('src/Foo.php', 11),
+            ),
+        );
+        $differences = new Differences(
+            [],
+            [new LineDiff('src/Foo.php', 10)],
+        );
+
+        $selected = $this->selector->selectTests($report, $differences);
+
+        self::assertCount(1, $selected);
+    }
+
+    #[Test]
+    public function fuzzMatchesExactlyOneLineBelow(): void
+    {
+        // Coverage at line 9 only, lineDiff at line 10. Fuzz -1 should catch it.
+        // Mutating -1 to -2 would make us look at line 8, missing the match.
+        $report = new TestCoverageReport(
+            new CommitIdentifier('abc123'),
+            new TestCoverage(
+                new TestName('App\\Tests\\FooTest::testBar'),
+                new LineCoverage('src/Foo.php', 9),
+            ),
+        );
+        $differences = new Differences(
+            [],
+            [new LineDiff('src/Foo.php', 10)],
+        );
+
+        $selected = $this->selector->selectTests($report, $differences);
+
+        self::assertCount(1, $selected);
+    }
+
+    #[Test]
+    public function fuzzDoesNotMatchTwoLinesAway(): void
+    {
+        // Coverage at line 12 only, lineDiff at line 10. Fuzz ±1 covers 9, 10, 11 — NOT 12.
+        // This kills the IncrementInteger mutation that would widen the range.
+        $report = new TestCoverageReport(
+            new CommitIdentifier('abc123'),
+            new TestCoverage(
+                new TestName('App\\Tests\\FooTest::testBar'),
+                new LineCoverage('src/Foo.php', 12),
+            ),
+        );
+        $differences = new Differences(
+            [],
+            [new LineDiff('src/Foo.php', 10)],
+        );
+
+        $selected = $this->selector->selectTests($report, $differences);
+
+        self::assertSame([], $selected);
+    }
 }

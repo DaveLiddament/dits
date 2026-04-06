@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<phpunit xmlns="https://schema.phpunit.de/coverage/1.0">
+  <project source="/app/src">
+    <directory name="/">
+      <file name="Missing.php" href="Missing.php.xml"/>
+      <file name="Calculator.php" href="Calculator.php.xml"/>
+    </directory>
+  </project>
+</phpunit>

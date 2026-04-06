@@ -16,6 +16,8 @@ Returns the list of `TestName` for tests that need to run, deduplicated.
 
 This is the inverse of the naive approach — we iterate the (small) diff and look up affected tests, rather than iterating every coverage entry to check if it's affected. This scales with diff size rather than coverage size.
 
+The fuzz radius is exactly ±1: it includes `lineNumber - 1`, `lineNumber`, and `lineNumber + 1`. A coverage entry exactly two lines away from a diff is NOT matched.
+
 
 
 ## Examples

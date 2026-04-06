@@ -17,7 +17,7 @@ Shell glob expansion works: `bin/merge-tcr coverage/*.json`
 
 ## Output
 
-Streams the merged TCR as JSON to stdout. The merged report contains all `testCoverages` from every input file, under the shared `commitIdentifier`.
+Streams the merged TCR as JSON to stdout. The merged report contains **all** `testCoverages` from every input file, under the shared `commitIdentifier`. No deduplication is performed — duplicate test names from different inputs are preserved.
 
 ## Errors
 

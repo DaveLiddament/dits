@@ -245,4 +245,103 @@ final class DiffFinderTest extends TestCase
         self::assertCount(0, $differences->fileDiffs);
         self::assertCount(0, $differences->lineDiffs);
     }
+
+    #[Test]
+    public function fileHeaderLinesAreNotTreatedAsDiffs(): void
+    {
+        // The "--- a/file.php" and "+++ b/file.php" lines start with - and +
+        // but they are file headers, NOT removed/added lines. They must be ignored.
+        $this->gitRunner->addResponse('--name-status', ["M\tsrc/Foo.php"]);
+        $this->gitRunner->addResponse('-- src/Foo.php', [
+            'diff --git a/src/Foo.php b/src/Foo.php',
+            '--- a/src/Foo.php',
+            '+++ b/src/Foo.php',
+            '@@ -10,1 +10,1 @@',
+            '-removed line',
+            '+added line',
+        ]);
+
+        $differences = $this->diffFinder->find('main', true);
+
+        // Should have exactly 2 LineDiffs: one for the removal at 10, one for the insertion at 11.
+        // If --- and +++ were treated as diffs, we'd have more.
+        self::assertCount(2, $differences->lineDiffs);
+        self::assertSame(10, $differences->lineDiffs[0]->lineNumber);
+        self::assertSame(11, $differences->lineDiffs[1]->lineNumber);
+    }
+
+    #[Test]
+    public function multipleConsecutiveRemovalsIncrementOldLineNumber(): void
+    {
+        // Multiple consecutive `-` lines should each get a different line number
+        $this->gitRunner->addResponse('--name-status', ["M\tsrc/Foo.php"]);
+        $this->gitRunner->addResponse('-- src/Foo.php', [
+            'diff --git a/src/Foo.php b/src/Foo.php',
+            '--- a/src/Foo.php',
+            '+++ b/src/Foo.php',
+            '@@ -10,3 +10,0 @@',
+            '-line 10',
+            '-line 11',
+            '-line 12',
+        ]);
+
+        $differences = $this->diffFinder->find('main', true);
+
+        $lineNumbers = array_map(static fn ($ld): int => $ld->lineNumber, $differences->lineDiffs);
+        self::assertSame([10, 11, 12], $lineNumbers);
+    }
+
+    #[Test]
+    public function multipleModifiedFilesAccumulateLineDiffs(): void
+    {
+        // Two files both modified — verifies the spread `[...$lineDiffs, ...new]` accumulates
+        // (rather than replacing) line diffs across iterations
+        $this->gitRunner->addResponse('--name-status', [
+            "M\tsrc/Foo.php",
+            "M\tsrc/Bar.php",
+        ]);
+        $this->gitRunner->addResponse('-- src/Foo.php', [
+            'diff --git a/src/Foo.php b/src/Foo.php',
+            '--- a/src/Foo.php',
+            '+++ b/src/Foo.php',
+            '@@ -10,1 +10,0 @@',
+            '-line 10',
+        ]);
+        $this->gitRunner->addResponse('-- src/Bar.php', [
+            'diff --git a/src/Bar.php b/src/Bar.php',
+            '--- a/src/Bar.php',
+            '+++ b/src/Bar.php',
+            '@@ -20,1 +20,0 @@',
+            '-line 20',
+        ]);
+
+        $differences = $this->diffFinder->find('main', true);
+
+        // We should have line diffs from BOTH files, not just the last one
+        self::assertCount(2, $differences->lineDiffs);
+        $fileNames = array_map(static fn ($ld): string => $ld->fileName, $differences->lineDiffs);
+        sort($fileNames);
+        self::assertSame(['src/Bar.php', 'src/Foo.php'], $fileNames);
+    }
+
+    #[Test]
+    public function pureInsertionAtVeryStartUsesLineOne(): void
+    {
+        // For a hunk @@ -0,0 +1,1 @@ (insertion before any existing line),
+        // oldLineNumber is 0. The max(1, 0) ensures we record LineDiff at line 1
+        // since LineDiff requires positive line numbers.
+        $this->gitRunner->addResponse('--name-status', ["M\tsrc/Foo.php"]);
+        $this->gitRunner->addResponse('-- src/Foo.php', [
+            'diff --git a/src/Foo.php b/src/Foo.php',
+            '--- a/src/Foo.php',
+            '+++ b/src/Foo.php',
+            '@@ -0,0 +1,1 @@',
+            '+new first line',
+        ]);
+
+        $differences = $this->diffFinder->find('main', true);
+
+        self::assertCount(1, $differences->lineDiffs);
+        self::assertSame(1, $differences->lineDiffs[0]->lineNumber);
+    }
 }

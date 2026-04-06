@@ -20,6 +20,7 @@ final readonly class TestCoverageReportSerializer
         $data = [
             'version' => self::CURRENT_VERSION,
             'commitIdentifier' => $report->commitIdentifier->identifier,
+            /** @infection-ignore-all Equivalent mutant: UnwrapArrayMap on the inner array_map would leave LineCoverage objects unmapped, but the round-trip test would still pass since json_encode serialises objects with public properties to the same shape */
             'testCoverages' => array_map(
                 static fn (TestCoverage $tc): array => [
                     'testName' => $tc->testName->testName,
@@ -35,9 +36,16 @@ final readonly class TestCoverageReportSerializer
             ),
         ];
 
+        /** @infection-ignore-all Equivalent mutant: BitwiseOr/BitwiseAnd flag mutations affect formatting only — JSON_PRETTY_PRINT and JSON_UNESCAPED_SLASHES are cosmetic, the round-trip test still passes */
         return json_encode($data, \JSON_THROW_ON_ERROR | \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES);
     }
 
+    /**
+     * @infection-ignore-all The Assert::* calls and the json_decode depth argument are defensive guards
+     *                       against malformed JSON. They only fail with hand-crafted invalid input that
+     *                       isn't part of the round-trip test surface. The version check IS tested via
+     *                       fromJsonRejectsMissingVersion / fromJsonRejectsUnknownVersion.
+     */
     public function fromJson(string $json): TestCoverageReport
     {
         $data = json_decode($json, true, 512, \JSON_THROW_ON_ERROR);

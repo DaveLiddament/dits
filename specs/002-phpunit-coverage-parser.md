@@ -12,7 +12,7 @@ We use `--coverage-xml` which produces a directory containing:
 
 File paths in `LineCoverage` are relative to the project root (git root). The parser takes a `sourcePrefix` parameter (e.g. `src/`) and prepends it to the path constructed from the `path` and `name` attributes on the `<file>` element (e.g. `src/` + `Service/` + `Logger.php` = `src/Service/Logger.php`).
 
-If a per-file XML referenced in `index.xml` is missing, it is silently skipped.
+If a per-file XML referenced in `index.xml` is missing, it is silently skipped (the parser continues processing subsequent file XMLs).
 
 ## Error handling
 

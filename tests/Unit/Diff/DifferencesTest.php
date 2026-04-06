@@ -55,4 +55,23 @@ final class DifferencesTest extends TestCase
         self::assertCount(2, $differences->fileDiffs);
         self::assertCount(3, $differences->lineDiffs);
     }
+
+    #[Test]
+    public function reindexesNonSequentialKeys(): void
+    {
+        // Pass arrays with gap keys; constructor should re-index to a list (0, 1, 2...)
+        $fileDiffs = [
+            5 => new FileDiff('src/Foo.php'),
+            10 => new FileDiff('src/Bar.php'),
+        ];
+        $lineDiffs = [
+            'a' => new LineDiff('src/Baz.php', 1),
+            'b' => new LineDiff('src/Qux.php', 2),
+        ];
+
+        $differences = new Differences($fileDiffs, $lineDiffs);
+
+        self::assertSame([0, 1], array_keys($differences->fileDiffs));
+        self::assertSame([0, 1], array_keys($differences->lineDiffs));
+    }
 }
