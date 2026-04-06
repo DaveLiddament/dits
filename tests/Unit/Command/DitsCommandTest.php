@@ -167,6 +167,25 @@ final class DitsCommandTest extends TestCase
     }
 
     #[Test]
+    public function missingCommitGivesHelpfulError(): void
+    {
+        $throwingRunner = new class implements \DaveLiddament\TestSelector\DiffFinder\GitCommandRunner {
+            public function run(array $args): array
+            {
+                throw new \RuntimeException("fatal: bad revision 'abc123'");
+            }
+        };
+
+        $commandTester = $this->buildCommandTester(self::TCR_JSON, $throwingRunner);
+
+        $commandTester->execute([]);
+
+        self::assertSame(2, $commandTester->getStatusCode());
+        self::assertStringContainsString('abc123 not found in local repo', $commandTester->getDisplay());
+        self::assertStringContainsString('Run all tests', $commandTester->getDisplay());
+    }
+
+    #[Test]
     public function phpunitFilterWithMultipleTests(): void
     {
         $commandTester = $this->createCommandTester(

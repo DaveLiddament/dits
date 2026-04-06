@@ -33,4 +33,4 @@ JSON array of test name strings.
 
 - **0** — success (tests selected, or no tests to run)
 - **1** — input error (invalid TCR JSON, empty stdin)
-- **2** — git error (diff failed)
+- **2** — git error (diff failed, or commit not found in local repo)

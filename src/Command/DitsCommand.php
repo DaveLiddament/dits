@@ -104,7 +104,16 @@ final class DitsCommand extends Command
             $diffFinder = new DiffFinder($gitRunner);
             $differences = $diffFinder->find($commitRef, $includeUnstaged);
         } catch (\Throwable $e) {
-            $output->writeln(sprintf('<error>Git diff failed: %s</error>', $e->getMessage()));
+            $message = $e->getMessage();
+
+            if (str_contains($message, 'bad revision') || str_contains($message, 'unknown revision')) {
+                $output->writeln(sprintf(
+                    '<error>Commit %s not found in local repo. Run all tests or fetch the commit.</error>',
+                    $commitRef,
+                ));
+            } else {
+                $output->writeln(sprintf('<error>Git diff failed: %s</error>', $message));
+            }
 
             return self::EXIT_GIT_ERROR;
         }
