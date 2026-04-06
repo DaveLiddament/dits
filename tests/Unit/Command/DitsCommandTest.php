@@ -17,6 +17,7 @@ final class DitsCommandTest extends TestCase
 {
     private const string TCR_JSON = <<<'JSON'
         {
+            "version": 1,
             "commitIdentifier": "abc123",
             "testCoverages": [
                 {
@@ -141,6 +142,25 @@ final class DitsCommandTest extends TestCase
 
         self::assertSame(1, $commandTester->getStatusCode());
         self::assertStringContainsString('Failed to parse', $commandTester->getDisplay());
+    }
+
+    #[Test]
+    public function unsupportedTcrVersionShowsClearError(): void
+    {
+        $futureVersionJson = json_encode([
+            'version' => 99,
+            'commitIdentifier' => 'abc123',
+            'testCoverages' => [],
+        ]);
+        self::assertNotFalse($futureVersionJson);
+
+        $gitRunner = new FakeGitCommandRunner();
+        $commandTester = $this->buildCommandTester($futureVersionJson, $gitRunner);
+
+        $commandTester->execute([]);
+
+        self::assertSame(1, $commandTester->getStatusCode());
+        self::assertStringContainsString('Unsupported TCR version 99', $commandTester->getDisplay());
     }
 
     #[Test]

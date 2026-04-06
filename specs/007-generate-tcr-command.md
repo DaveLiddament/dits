@@ -24,6 +24,7 @@ Streams JSON to stdout (or to file if `--output` is given). The JSON structure i
 
 ```json
 {
+  "version": 1,
   "commitIdentifier": "<sha>",
   "testCoverages": [
     {
@@ -35,3 +36,7 @@ Streams JSON to stdout (or to file if `--output` is given). The JSON structure i
   ]
 }
 ```
+
+## Versioning
+
+The TCR JSON includes a `version` field. The current version is `1`. The parser refuses to read TCRs with a missing or unknown version, so format changes can be detected explicitly.

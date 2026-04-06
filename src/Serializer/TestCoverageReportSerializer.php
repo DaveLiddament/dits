@@ -13,9 +13,12 @@ use Webmozart\Assert\Assert;
 
 final readonly class TestCoverageReportSerializer
 {
+    public const int CURRENT_VERSION = 1;
+
     public function toJson(TestCoverageReport $report): string
     {
         $data = [
+            'version' => self::CURRENT_VERSION,
             'commitIdentifier' => $report->commitIdentifier->identifier,
             'testCoverages' => array_map(
                 static fn (TestCoverage $tc): array => [
@@ -41,6 +44,14 @@ final readonly class TestCoverageReportSerializer
         Assert::isArray($data);
 
         /** @var array<string, mixed> $data */
+        Assert::keyExists($data, 'version', 'TCR JSON missing required "version" field');
+        Assert::integer($data['version'], 'TCR JSON "version" must be an integer');
+        Assert::same(
+            $data['version'],
+            self::CURRENT_VERSION,
+            sprintf('Unsupported TCR version %d. Expected version %d.', $data['version'], self::CURRENT_VERSION),
+        );
+
         Assert::keyExists($data, 'commitIdentifier');
         Assert::keyExists($data, 'testCoverages');
         Assert::string($data['commitIdentifier']);
