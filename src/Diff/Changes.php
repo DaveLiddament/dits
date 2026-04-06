@@ -6,25 +6,39 @@ namespace DaveLiddament\TestSelector\Diff;
 
 readonly class Changes
 {
-    public function __construct(
-        private Differences $differences,
-    ) {
+    /** @var array<string, true> */
+    private array $fileDiffsIndex;
+
+    /** @var array<string, array<int, true>> */
+    private array $lineDiffsIndex;
+
+    public function __construct(Differences $differences)
+    {
+        $fileDiffsIndex = [];
+        foreach ($differences->fileDiffs as $fileDiff) {
+            $fileDiffsIndex[$fileDiff->fileName] = true;
+        }
+        $this->fileDiffsIndex = $fileDiffsIndex;
+
+        $lineDiffsIndex = [];
+        foreach ($differences->lineDiffs as $lineDiff) {
+            $lineDiffsIndex[$lineDiff->fileName][$lineDiff->lineNumber] = true;
+        }
+        $this->lineDiffsIndex = $lineDiffsIndex;
     }
 
     public function hasChanged(string $fileName, int $lineNumber): bool
     {
-        foreach ($this->differences->fileDiffs as $fileDiff) {
-            if ($fileDiff->fileName === $fileName) {
-                return true;
-            }
+        if (isset($this->fileDiffsIndex[$fileName])) {
+            return true;
         }
 
-        foreach ($this->differences->lineDiffs as $lineDiff) {
-            if ($lineDiff->fileName === $fileName && abs($lineDiff->lineNumber - $lineNumber) <= 1) {
-                return true;
-            }
+        if (!isset($this->lineDiffsIndex[$fileName])) {
+            return false;
         }
 
-        return false;
+        $lines = $this->lineDiffsIndex[$fileName];
+
+        return isset($lines[$lineNumber - 1]) || isset($lines[$lineNumber]) || isset($lines[$lineNumber + 1]);
     }
 }
