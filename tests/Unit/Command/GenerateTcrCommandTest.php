@@ -103,4 +103,35 @@ final class GenerateTcrCommandTest extends TestCase
         self::assertSame('test123', $report->commitIdentifier->identifier);
         self::assertCount(3, $report->testCoverages);
     }
+
+    #[Test]
+    public function outputOptionWritesToFile(): void
+    {
+        $fixturesDir = __DIR__.'/../CoverageParser/Fixtures';
+        $outputFile = sys_get_temp_dir().'/dits-test-output-'.bin2hex(random_bytes(4)).'.json';
+
+        try {
+            $this->commandTester->execute([
+                'coverage-xml-dir' => $fixturesDir,
+                '--source-dir' => 'src/',
+                '--commit' => 'abc123',
+                '--output' => $outputFile,
+            ]);
+
+            self::assertSame(0, $this->commandTester->getStatusCode());
+            self::assertFileExists($outputFile);
+            self::assertStringContainsString('TCR written to', $this->commandTester->getDisplay());
+
+            $json = file_get_contents($outputFile);
+            self::assertNotFalse($json);
+
+            $serializer = new \DaveLiddament\TestSelector\Serializer\TestCoverageReportSerializer();
+            $report = $serializer->fromJson($json);
+            self::assertSame('abc123', $report->commitIdentifier->identifier);
+        } finally {
+            if (file_exists($outputFile)) {
+                unlink($outputFile);
+            }
+        }
+    }
 }

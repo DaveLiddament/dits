@@ -10,6 +10,7 @@ final class DitsConfig
     private ?string $commit = null;
     private bool $includeUnstaged = false;
     private string $format = 'list';
+    private ?string $output = null;
 
     private function __construct()
     {
@@ -66,5 +67,17 @@ final class DitsConfig
     public function getFormat(): string
     {
         return $this->format;
+    }
+
+    public function output(string $output): self
+    {
+        $this->output = $output;
+
+        return $this;
+    }
+
+    public function getOutput(): ?string
+    {
+        return $this->output;
     }
 }

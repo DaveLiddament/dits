@@ -52,6 +52,13 @@ final class GenerateTcrCommand extends Command
         );
 
         $this->addOption(
+            'output',
+            'o',
+            InputOption::VALUE_REQUIRED,
+            'Write TCR to file instead of stdout',
+        );
+
+        $this->addOption(
             'config',
             null,
             InputOption::VALUE_REQUIRED,
@@ -87,7 +94,22 @@ final class GenerateTcrCommand extends Command
         $report = $this->parser->parse($coverageXmlDir, $commitIdentifier, $sourceDir);
         $json = $this->serializer->toJson($report);
 
-        $output->writeln($json);
+        /** @var string|null $outputOption */
+        $outputOption = $input->getOption('output');
+        $outputPath = $outputOption ?? $config->getOutput();
+
+        if (null !== $outputPath) {
+            $result = file_put_contents($outputPath, $json."\n");
+            if (false === $result) {
+                $output->writeln(sprintf('<error>Failed to write to file: %s</error>', $outputPath));
+
+                return Command::FAILURE;
+            }
+
+            $output->writeln(sprintf('TCR written to %s', $outputPath));
+        } else {
+            $output->writeln($json);
+        }
 
         return Command::SUCCESS;
     }

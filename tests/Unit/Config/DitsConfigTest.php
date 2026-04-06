@@ -21,6 +21,7 @@ final class DitsConfigTest extends TestCase
         self::assertNull($config->getCommit());
         self::assertFalse($config->isIncludeUnstaged());
         self::assertSame('list', $config->getFormat());
+        self::assertNull($config->getOutput());
     }
 
     #[Test]
@@ -30,11 +31,13 @@ final class DitsConfigTest extends TestCase
             ->sourceDir('lib/')
             ->commit('abc123')
             ->includeUnstaged()
-            ->format('json');
+            ->format('json')
+            ->output('coverage.json');
 
         self::assertSame('lib/', $config->getSourceDir());
         self::assertSame('abc123', $config->getCommit());
         self::assertTrue($config->isIncludeUnstaged());
         self::assertSame('json', $config->getFormat());
+        self::assertSame('coverage.json', $config->getOutput());
     }
 }

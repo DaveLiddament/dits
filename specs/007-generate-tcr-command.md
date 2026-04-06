@@ -16,10 +16,11 @@ bin/generate-tcr <coverage-xml-dir> [--source-dir=src/] [--commit=<sha>]
 
 - `--source-dir` / `-s` (default: `src/`) — source directory relative to the project root
 - `--commit` / `-c` (optional) — commit SHA to record in the TCR; if omitted, runs `git rev-parse HEAD`
+- `--output` / `-o` (optional) — write TCR to file instead of stdout
 
 ## Output
 
-Streams JSON to stdout. The JSON structure is:
+Streams JSON to stdout (or to file if `--output` is given). The JSON structure is:
 
 ```json
 {

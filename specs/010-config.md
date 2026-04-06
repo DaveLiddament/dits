@@ -30,6 +30,7 @@ All methods are optional — omitted values use defaults.
 |---|---|---|
 | `sourceDir(string)` | `src/` | generate-tcr |
 | `commit(string)` | `git rev-parse HEAD` | generate-tcr |
+| `output(string)` | stdout | generate-tcr |
 | `includeUnstaged()` | `false` | dits |
 | `format(string)` | `list` | dits |
 
