@@ -17,6 +17,9 @@
             <directory>tests/External</directory>
             <exclude>tests/External/Fixtures</exclude>
         </testsuite>
+        <testsuite name="end-to-end">
+            <directory>tests/EndToEnd</directory>
+        </testsuite>
     </testsuites>
 
     <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
